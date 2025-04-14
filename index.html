@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Search Engine</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+    }
+    .container {
+      margin-top: 50px;
+    }
+    h1, h2 {
+      text-shadow: 2px 2px 4px #000;
+    }
+    .image-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .image-card {
+      width: 250px;
+      margin: 15px;
+      padding: 10px;
+      background: #222;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .image-card:hover {
+      transform: scale(1.05);
+    }
+    .image-card img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+    .modal-content {
+      background: #333;
+      color: #fff;
+    }
+    .btn-close {
+      filter: invert(1);
+    }
+    input.form-control, button.btn {
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container text-center">
+    <h1 class="mb-4">Movie Search Engine</h1>
+    <form action="/search" method="post">
+      <input type="text" name="query" placeholder="Looking for a movie? Start typing!!" class="form-control w-50 mx-auto">
+      <button type="submit" class="btn btn-primary mt-3">Search</button>
+    </form>
+  </div>
+
+  <div class="container mt-5">
+    {% if results %}
+      <h2 class="text-center">Results for "{{ query }}"</h2>
+      <div class="image-grid">
+        {% for image in results %}
+          <div class="image-card" data-bs-toggle="modal" data-bs-target="#movieModal{{ image['id'] }}">
+            <img src="{{ url_for('static', filename=image['poster_path']) }}" alt="{{ image['title'] }}">
+            <h5>{{ image['title'] }}</h5>
+            <p>{{ image['release_date'] }}</p>
+          </div>
+
+          <!-- Modal for Movie Details -->
+          <div class="modal fade" id="movieModal{{ image['id'] }}" tabindex="-1" aria-labelledby="movieModalLabel{{ image['id'] }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="movieModalLabel{{ image['id'] }}">{{ image['title'] }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <img src="{{ url_for('static', filename=image['poster_path']) }}" class="img-fluid mb-3" alt="{{ image['title'] }}">
+                  <p><strong>Release Date:</strong> {{ image['release_date'] }}</p>
+                  <p><strong>Genres:</strong> {{ ', '.join(image['genres']) }}</p>
+                  <p><strong>Rating:</strong> {{ image['rating'] }}</p>
+                  <p><strong>Overview:</strong> {{ image['overview'] }}</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+
+</body>
+</html>
